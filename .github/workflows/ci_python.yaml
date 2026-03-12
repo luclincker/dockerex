@@ -1,0 +1,49 @@
+name: Python Workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        pytest
+
+    - name: Run pylint
+      run: |
+        pylint *.py
+
+    - name: Security scan with bandit
+      run: |
+        bandit -r . -x test_counter.py
+
+    - name: Dependency vulnerability scan
+      run: |
+        pip-audit
+
+    - name: Build Docker image
+      run: |
+        docker build -t devops-demo .
+
+    - name: Scan Docker image with Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: devops-demo
