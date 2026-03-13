@@ -1,4 +1,4 @@
 pytest
 pylint
 bandit
-pip-audit
+psycopg2-binary
